@@ -1,0 +1,168 @@
+### Base URL
+@baseUrl = http://localhost:5000/api/assets
+
+### 1. Tambahkan Aset Baru dengan Masa Garansi (POST)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+    "rfidTag": {
+        "uid": "UID12345",
+        "epc": "EPC67890"
+    },
+    "name": "Laptop Dell",
+    "description": "Laptop untuk karyawan",
+    "location": "Ruang IT",
+    "kategori": "Elektronik",
+    "status": "tersedia",
+    "jumlah": 1,
+    "unit": "pcs",
+    "price": 15000000,
+    "tanggalPembelian": "2023-09-01",
+    "masaGaransi": {
+        "from": "2023-09-01",
+        "to": "2024-09-01"
+    }
+}
+
+### 2. Tambahkan Aset Baru Tanpa Masa Garansi (POST)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+    "rfidTag": {
+        "uid": "UID67890",
+        "epc": "EPC12345"
+    },
+    "name": "Paket Alat Tulis",
+    "description": "Paket alat tulis untuk kantor",
+    "location": "Gudang Utama",
+    "kategori": "Alat Kantor",
+    "status": "tersedia",
+    "jumlah": 10,
+    "unit": "pack",
+    "product": ["Pensil", "Penghapus", "Buku Catatan"],
+    "price": 500000,
+    "tanggalPembelian": "2023-08-15"
+}
+
+### 3. Dapatkan Semua Aset (GET)
+GET {{baseUrl}}
+
+### 4. Dapatkan Aset Berdasarkan UID atau EPC (GET)
+GET {{baseUrl}}/UID12345
+
+### 5. Perbarui Aset dengan Masa Garansi Baru (PUT)
+PUT {{baseUrl}}/UID12345
+Content-Type: application/json
+
+{
+    "masaGaransi": {
+        "from": "2024-01-01",
+        "to": "2025-01-01"
+    }
+}
+
+### 6. Hapus Aset Berdasarkan UID atau EPC (DELETE)
+DELETE {{baseUrl}}/UID67890
+
+### TRACKING
+### Tracking berdasarkan category
+GET {{baseUrl}}/track/tags?category=electronics
+
+### Tracking berdasarkan nama
+GET {{baseUrl}}/track/tags?name=Laptop
+
+### Tracking berdasarkan location
+GET {{baseUrl}}/track/tags?location=Ruang%20IT
+
+### Tracking berdasarkan status
+GET {{baseUrl}}/track/tags?status=available
+
+### USER
+@baseUrl = http://localhost:5000/api/auth
+### registrasi
+POST {{baseUrl}}/register
+Content-Type: application/json
+
+{
+    "name": "John Auditor",
+    "email": "john_auditor@example.com",
+    "password": "password123",
+    "role": "auditor"
+}
+
+### login
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+    "email": "john_user@example.com",
+    "password": "password123"
+}
+
+### post data asset menggunakan auth admin
+POST http://localhost:5000/api/assets
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2ZkY2I2MTc1NDY3MGZlMDY4YWVkNTQiLCJyb2xlIjoidXNlciIsImlhdCI6MTc0NDY5Mjc3MSwiZXhwIjoxNzQ0Njk2MzcxfQ.pyeS7nAozi1rpRtdQF-J9iykRrnnxuzwFDP6CEr9xHs
+Content-Type: application/json
+
+{
+    "rfidTag": { "uid": "UID123", "epc": "EPC456" },
+    "name": "Laptop Dell",
+    "description": "Laptop untuk karyawan",
+    "location": "Ruang IT",
+    "kategori": "Elektronik",
+    "status": "tersedia",
+    "jumlah": 1,
+    "unit": "pcs",
+    "price": 15000000,
+    "tanggalPembelian": "2023-09-01"
+}
+
+### PEMINJAMAN
+POST http://localhost:5000/api/borrowing/borrow
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2ZkY2I2MTc1NDY3MGZlMDY4YWVkNTQiLCJyb2xlIjoidXNlciIsImlhdCI6MTc0NDcwMjEwMSwiZXhwIjoxNzQ0NzA1NzAxfQ.zgimFvbM0io2uVJWFX7KUWqqCwS1HNprEofOnzqyVGc
+Content-Type: application/json
+
+{
+    "rfidTags": [
+        { "uid": "20 00 40 13 3F 44 16 BC", "epc": "E2 80 69 95 00 00 40 13 3F 44 16 BC" },
+        { "uid": "20 00 40 13 3F 44 36 BB", "epc": "E2 80 69 95 00 00 40 13 3F 44 36 BB" }
+    ]
+}
+
+### Peminjaman lebih dari 1 sekaligus
+PUT http://localhost:5000/api/borrowing/return
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2ZkY2I2MTc1NDY3MGZlMDY4YWVkNTQiLCJyb2xlIjoidXNlciIsImlhdCI6MTc0NDcwMjMzOCwiZXhwIjoxNzQ0NzA1OTM4fQ.z6jhFpGObavfkwpa6MGHjxyGRMAW8TZSX7RtVRU4Cj4
+Content-Type: application/json
+
+{
+    "rfidTags": [
+        { "uid": "UID123", "epc": "EPC456" }
+    ]
+}
+
+### Pengembalian
+POST http://localhost:5000/api/borrowing/return
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2ZkY2I2MTc1NDY3MGZlMDY4YWVkNTQiLCJyb2xlIjoidXNlciIsImlhdCI6MTc0NDcwMjMzOCwiZXhwIjoxNzQ0NzA1OTM4fQ.z6jhFpGObavfkwpa6MGHjxyGRMAW8TZSX7RtVRU4Cj4
+Content-Type: application/json
+
+{
+    "rfidTags": [
+        { "uid": "UID123", "epc": "EPC456" },
+        { "uid": "20 00 40 13 3F 44 16 BC", "epc": "E2 80 69 95 00 00 40 13 3F 44 16 BC" },
+        { "uid": "20 00 40 13 3F 44 36 BB", "epc": "E2 80 69 95 00 00 40 13 3F 44 36 BB" }
+    ]
+}
+
+###
+POST http://localhost:5000/api/checkout/checkout
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2ZkY2I2MTc1NDY3MGZlMDY4YWVkNTQiLCJyb2xlIjoidXNlciIsImlhdCI6MTc0NDc1NTU3MiwiZXhwIjoxNzQ0NzU5MTcyfQ.kUgKLlmZ4uhERUJRYiV-5RXfk9GZ92oSp0QE7VuX8KA
+Content-Type: application/json
+
+{
+    "rfidTags": [
+        { "uid": "UID123", "epc": "EPC456" },
+        { "uid": "20 00 40 13 3F 44 16 BC", "epc": "E2 80 69 95 00 00 40 13 3F 44 16 BC" }
+    ]
+}
